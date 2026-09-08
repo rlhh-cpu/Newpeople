@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>認識飯店各位家長 - 遠雄主管團隊</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        farglory: {
+                            50: '#f4f7fa',
+                            100: '#e1e8f0',
+                            500: '#1e3a8a',
+                            600: '#1d3557',
+                            700: '#0f172a',
+                            gold: '#d4af37',
+                            goldHover: '#b89628'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'Microsoft JhengHei', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for clean modals */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 font-sans antialiased min-h-screen flex flex-col selection:bg-amber-100 selection:text-amber-900">
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-40 bg-slate-900/95 backdrop-blur-md text-white shadow-lg border-b border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="filterCategory('all')">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-amber-500 to-amber-300 flex items-center justify-center text-slate-900 font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-hotel text-slate-950"></i>
+                </div>
+                <div>
+                    <h1 class="text-base sm:text-lg font-bold tracking-wide text-amber-400">認識飯店各位家長</h1>
+                    <p class="text-[10px] text-slate-400 tracking-wider uppercase">遠雄企業主管團隊名錄</p>
+                </div>
+            </div>
+
+            <!-- Header Action Controls -->
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <div id="adminBadge" class="hidden items-center space-x-1.5 px-3 py-1 bg-amber-500/10 border border-amber-500/30 rounded-full text-amber-400 text-xs font-medium">
+                    <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                    <span>管理員模式</span>
+                </div>
+
+                <button id="addPersonnelBtn" onclick="openAddModal()" class="hidden items-center space-x-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-semibold px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-all shadow-md active:scale-95">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden sm:inline">新增主管</span>
+                </button>
+
+                <button id="loginBtn" onclick="openLoginModal()" class="flex items-center space-x-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 px-3.5 py-1.5 rounded-lg text-xs sm:text-sm transition-colors">
+                    <i class="fa-solid fa-lock text-amber-400"></i>
+                    <span>管理員解鎖</span>
+                </button>
+
+                <button id="logoutBtn" onclick="handleLogout()" class="hidden items-center space-x-1.5 bg-red-950/40 hover:bg-red-900/60 text-red-300 border border-red-800/50 px-3 py-1.5 rounded-lg text-xs sm:text-sm transition-colors">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                    <span>退出</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Banner & Filter Section -->
+    <main class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden border border-slate-800">
+            <div class="relative z-10 max-w-2xl">
+                <span class="inline-block px-3 py-1 bg-amber-400/10 text-amber-400 text-xs font-semibold rounded-full border border-amber-400/20 mb-3">
+                    FARGLORY GROUP EXECUTIVE TEAM
+                </span>
+                <h2 class="text-2xl sm:text-3xl font-bold tracking-tight mb-2">遠雄企業經營團隊介紹</h2>
+                <p class="text-slate-300 text-xs sm:text-sm leading-relaxed">
+                    歡迎認識遠雄集團與飯店營運管理團隊主管，共同打造卓越高品質的住宿與休閒體驗。
+                </p>
+            </div>
+            <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-x-10 translate-y-10">
+                <i class="fa-solid fa-building-user text-[200px]"></i>
+            </div>
+        </div>
+
+        <!-- Filter Tabs & Search Bar -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+            <!-- Category Tabs -->
+            <div class="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-2 md:pb-0 custom-scrollbar">
+                <button onclick="filterCategory('all')" id="btn-all" class="category-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-slate-900 text-white shadow-sm">
+                    全部主管
+                </button>
+                <button onclick="filterCategory('group')" id="btn-group" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    集團高層
+                </button>
+                <button onclick="filterCategory('recreation')" id="btn-recreation" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    遊憩事業
+                </button>
+                <button onclick="filterCategory('operations')" id="btn-operations" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    營運管理
+                </button>
+                <button onclick="filterCategory('hotel')" id="btn-hotel" class="category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-white text-slate-600 hover:bg-slate-100 border border-slate-200">
+                    飯店與公園
+                </button>
+            </div>
+
+            <!-- Search Input -->
+            <div class="relative w-full md:w-64">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="searchInput" oninput="handleSearch()" placeholder="搜尋姓名或職稱..." class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent shadow-sm">
+            </div>
+        </div>
+
+        <!-- Personnel Cards Grid -->
+        <div id="teamGrid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6">
+            <!-- Dynamically populated cards will be inserted here -->
+        </div>
+
+        <!-- Empty State -->
+        <div id="emptyState" class="hidden text-center py-16 bg-white rounded-2xl border border-slate-200 shadow-sm">
+            <div class="w-16 h-16 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl">
+                <i class="fa-solid fa-user-slash"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-700 mb-1">查無符合條件的主管成員</h3>
+            <p class="text-xs text-slate-400">請嘗試更改分類選擇或搜尋關鍵字。</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800 text-center text-xs mt-auto">
+        <div class="max-w-7xl mx-auto px-4">
+            <p class="mb-2">© 遠雄悅來大飯店 & 遠雄集團 Farglory Group. All Rights Reserved.</p>
+            <div class="flex items-center justify-center space-x-4 text-[11px] text-slate-500">
+                <span>認識飯店各位家長</span>
+                <span>•</span>
+                <button onclick="resetToDefaultData()" class="text-slate-500 hover:text-amber-400 transition-colors">恢復預設主管名冊</button>
+            </div>
+        </div>
+    </footer>
+
+    <!-- MODALS SECTION -->
+
+    <!-- 1. Password Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 transform transition-all">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900">管理員身份驗證</h3>
+                </div>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-slate-600 text-sm">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">請輸入通行密碼</label>
+                    <input type="password" id="passwordInput" placeholder="請輸入管理員密碼" autocomplete="off" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    <p id="loginError" class="text-xs text-red-500 mt-1.5 hidden flex items-center gap-1">
+                        <i class="fa-solid fa-circle-exclamation"></i> 密碼錯誤，請重新輸入！
+                    </p>
+                </div>
+                <div class="flex justify-end space-x-2 pt-2">
+                    <button type="button" onclick="closeLoginModal()" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-medium text-white bg-slate-900 hover:bg-slate-800 rounded-lg shadow-sm">驗證解鎖</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 2. Add Personnel Modal -->
+    <div id="addModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                        <i class="fa-solid fa-user-plus"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900">新增主管人員</h3>
+                </div>
+                <button onclick="closeAddModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleAddPersonnel(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="addName" required placeholder="例如: 張大明" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">職稱 <span class="text-red-500">*</span></label>
+                    <input type="text" id="addTitle" required placeholder="例如: 營運總監" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">分類類別 <span class="text-red-500">*</span></label>
+                    <select id="addCategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="group">集團高層</option>
+                        <option value="recreation">遊憩事業</option>
+                        <option value="operations">營運管理</option>
+                        <option value="hotel" selected>飯店與公園</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">主管照片</label>
+                    <div class="space-y-2">
+                        <!-- Local file upload option -->
+                        <label class="w-full cursor-pointer bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs py-2 px-3 rounded-lg border border-slate-300 flex items-center justify-center space-x-2 transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-up text-amber-600"></i>
+                            <span id="addFileUploadLabel">從本機選取照片檔案</span>
+                            <input type="file" id="addAvatarFile" accept="image/*" onchange="handleAddFileSelect(event)" class="hidden">
+                        </label>
+                        <div class="flex items-center text-[10px] text-slate-400">
+                            <span class="flex-grow border-t border-slate-200"></span>
+                            <span class="px-2">或填寫圖片網址</span>
+                            <span class="flex-grow border-t border-slate-200"></span>
+                        </div>
+                        <input type="url" id="addAvatarUrl" placeholder="https://example.com/photo.jpg" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeAddModal()" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow-sm">確認新增</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 3. Edit Personnel Modal -->
+    <div id="editModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 max-h-[90vh] overflow-y-auto custom-scrollbar">
+            <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-600 flex items-center justify-center">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900">編輯主管資料與照片</h3>
+                </div>
+                <button onclick="closeEditModal()" class="text-slate-400 hover:text-slate-600">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+
+            <form onsubmit="handleEditPersonnel(event)" class="space-y-4">
+                <input type="hidden" id="editId">
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">姓名 <span class="text-red-500">*</span></label>
+                    <input type="text" id="editName" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">職稱 <span class="text-red-500">*</span></label>
+                    <input type="text" id="editTitle" required class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">分類類別 <span class="text-red-500">*</span></label>
+                    <select id="editCategory" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-sm focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                        <option value="group">集團高層</option>
+                        <option value="recreation">遊憩事業</option>
+                        <option value="operations">營運管理</option>
+                        <option value="hotel">飯店與公園</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">相片預覽與變更</label>
+                    <div class="space-y-3">
+                        <div class="flex items-center space-x-3 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                            <img id="editPreviewAvatar" src="" class="w-12 h-12 rounded-lg object-cover border border-amber-400 shadow-sm" alt="預覽">
+                            <div class="text-xs">
+                                <p class="font-semibold text-slate-800">目前相片預覽</p>
+                                <p class="text-[10px] text-slate-400">保留原設定或於下方更換</p>
+                            </div>
+                        </div>
+
+                        <!-- Local file upload option -->
+                        <label class="w-full cursor-pointer bg-amber-50 hover:bg-amber-100 text-amber-900 text-xs py-2 px-3 rounded-lg border border-amber-200 flex items-center justify-center space-x-2 transition-colors">
+                            <i class="fa-solid fa-cloud-arrow-up text-amber-600"></i>
+                            <span id="editFileUploadLabel">選擇本機相片檔案</span>
+                            <input type="file" id="editAvatarFile" accept="image/*" onchange="handleEditFileSelect(event)" class="hidden">
+                        </label>
+
+                        <div class="flex items-center text-[10px] text-slate-400">
+                            <span class="flex-grow border-t border-slate-200"></span>
+                            <span class="px-2">或更換圖片網址</span>
+                            <span class="flex-grow border-t border-slate-200"></span>
+                        </div>
+                        <input type="url" id="editAvatarUrl" placeholder="https://example.com/photo.jpg" oninput="updateEditPreviewFromUrl(this.value)" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-amber-500 focus:outline-none">
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end space-x-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="closeEditModal()" class="px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+                    <button type="submit" class="px-4 py-1.5 text-xs font-medium text-white bg-amber-600 hover:bg-amber-700 rounded-lg shadow-sm">儲存變更</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 4. Delete Confirm Modal -->
+    <div id="deleteModal" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 flex items-center justify-center hidden p-4">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-100 text-center">
+            <div class="w-12 h-12 rounded-full bg-red-100 text-red-600 flex items-center justify-center mx-auto mb-3 text-lg">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 class="text-base font-bold text-slate-900 mb-1">確認刪除此主管？</h3>
+            <p id="deleteTargetName" class="text-xs text-slate-500 mb-5">這項操作無法復原。</p>
+            <div class="flex items-center justify-center space-x-2">
+                <button onclick="closeDeleteModal()" class="px-4 py-2 text-xs font-medium text-slate-600 hover:bg-slate-100 rounded-lg">取消</button>
+                <button onclick="confirmDelete()" class="px-4 py-2 text-xs font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg shadow-sm">確認刪除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 5. Toast Notification -->
+    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 bg-slate-900 text-white text-xs px-4 py-3 rounded-xl shadow-2xl border border-slate-800 flex items-center space-x-2">
+        <i class="fa-solid fa-circle-check text-emerald-400 text-sm"></i>
+        <span id="toastMsg">提示訊息</span>
+    </div>
+
+    <!-- JAVASCRIPT SYSTEM ENGINE -->
+    <script>
+        // System Data & Default Roster (Extracted from 2.認識飯店各位家長.pdf)
+        const DEFAULT_ROSTER = [
+            {
+                id: 'm1',
+                name: '趙文嘉',
+                title: '副董事長',
+                category: 'group',
+                avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm2',
+                name: '趙信清',
+                title: '副董事長',
+                category: 'group',
+                avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm3',
+                name: '趙文瑜',
+                title: '執行副總',
+                category: 'group',
+                avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm4',
+                name: '洪賢德',
+                title: '顧問',
+                category: 'group',
+                avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm5',
+                name: '武祥生',
+                title: '遊憩管理處 董事長',
+                category: 'recreation',
+                avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm6',
+                name: '許自強',
+                title: '總管理處 總經理',
+                category: 'operations',
+                avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm7',
+                name: '陳美玲',
+                title: '營運長',
+                category: 'group',
+                avatar: 'https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm8',
+                name: '吳聲德',
+                title: '營運管理處 經理',
+                category: 'operations',
+                avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm9',
+                name: '莊政雄',
+                title: '採購協理',
+                category: 'operations',
+                avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm10',
+                name: '沈建劭',
+                title: '遠雄大飯店&海洋公園 總經理',
+                category: 'hotel',
+                avatar: 'https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm11',
+                name: '饒明昌',
+                title: '遊憩管理處 協理',
+                category: 'recreation',
+                avatar: 'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&auto=format&fit=crop&q=80'
+            },
+            {
+                id: 'm12',
+                name: '劉惠美',
+                title: '遠雄悅來大飯店 總經理',
+                category: 'hotel',
+                avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&auto=format&fit=crop&q=80'
+            }
+        ];
+
+        // System State
+        let teamData = [];
+        let currentFilter = 'all';
+        let isAdminLoggedIn = false;
+        let pendingDeleteId = null;
+        let addUploadedBase64 = '';
+        let editUploadedBase64 = '';
+
+        // Encrypted Passcode Hash Check (8410)
+        const PASSCODE = '8410';
+
+        // Category Tag Mapping
+        const CATEGORY_MAP = {
+            group: { label: '集團高層', class: 'bg-amber-100 text-amber-800 border-amber-200' },
+            recreation: { label: '遊憩事業', class: 'bg-emerald-100 text-emerald-800 border-emerald-200' },
+            operations: { label: '營運管理', class: 'bg-blue-100 text-blue-800 border-blue-200' },
+            hotel: { label: '飯店與公園', class: 'bg-indigo-100 text-indigo-800 border-indigo-200' }
+        };
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            loadTeamData();
+            renderTeam();
+        });
+
+        // Load data from LocalStorage
+        function loadTeamData() {
+            const saved = localStorage.getItem('farglory_team_data');
+            if (saved) {
+                try {
+                    teamData = JSON.parse(saved);
+                } catch (e) {
+                    teamData = [...DEFAULT_ROSTER];
+                }
+            } else {
+                teamData = [...DEFAULT_ROSTER];
+            }
+        }
+
+        // Save data to LocalStorage
+        function saveTeamData() {
+            localStorage.setItem('farglory_team_data', JSON.stringify(teamData));
+        }
+
+        // Reset to default
+        function resetToDefaultData() {
+            teamData = [...DEFAULT_ROSTER];
+            saveTeamData();
+            renderTeam();
+            showToast('已恢復預設名冊數據');
+        }
+
+        // Render Personnel Cards
+        function renderTeam() {
+            const grid = document.getElementById('teamGrid');
+            const emptyState = document.getElementById('emptyState');
+            const searchVal = document.getElementById('searchInput').value.trim().toLowerCase();
+
+            grid.innerHTML = '';
+
+            const filtered = teamData.filter(member => {
+                const matchCategory = currentFilter === 'all' || member.category === currentFilter;
+                const matchSearch = member.name.toLowerCase().includes(searchVal) ||
+                                    member.title.toLowerCase().includes(searchVal);
+                return matchCategory && matchSearch;
+            });
+
+            if (filtered.length === 0) {
+                emptyState.classList.remove('hidden');
+                return;
+            } else {
+                emptyState.classList.add('hidden');
+            }
+
+            filtered.forEach(member => {
+                const catObj = CATEGORY_MAP[member.category] || { label: '其他', class: 'bg-slate-100 text-slate-800 border-slate-200' };
+
+                const card = document.createElement('div');
+                card.className = 'group bg-white rounded-2xl overflow-hidden border border-slate-200/80 shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col relative';
+
+                card.innerHTML = `
+                    <!-- Admin Action Overlay Buttons -->
+                    ${isAdminLoggedIn ? `
+                        <div class="absolute top-2.5 right-2.5 flex items-center space-x-1.5 z-20">
+                            <button onclick="openEditModal('${member.id}')" class="w-7 h-7 rounded-full bg-amber-500/90 hover:bg-amber-600 text-white flex items-center justify-center text-xs shadow-md transition-transform hover:scale-110" title="編輯資料與照片">
+                                <i class="fa-solid fa-pen"></i>
+                            </button>
+                            <button onclick="openDeleteModal('${member.id}', '${member.name}')" class="w-7 h-7 rounded-full bg-red-600/90 hover:bg-red-700 text-white flex items-center justify-center text-xs shadow-md transition-transform hover:scale-110" title="刪除此成員">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <!-- Photo Container -->
+                    <div class="aspect-[3/4] w-full bg-slate-100 overflow-hidden relative">
+                        <img src="${member.avatar}"
+                             alt="${member.name}"
+                             onerror="this.onerror=null; this.src='https://placehold.co/300x400/0f172a/fbbf24?text=${encodeURIComponent(member.name)}';"
+                             class="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500">
+                    </div>
+
+                    <!-- Card Information (Only Photo, Name, Title, Category) -->
+                    <div class="p-3.5 flex-grow flex flex-col justify-between text-center bg-white">
+                        <div>
+                            <!-- Category Badge -->
+                            <span class="inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold border ${catObj.class} mb-1.5">
+                                ${catObj.label}
+                            </span>
+
+                            <!-- Name -->
+                            <h3 class="text-sm sm:text-base font-bold text-slate-900 group-hover:text-amber-600 transition-colors">
+                                ${member.name}
+                            </h3>
+
+                            <!-- Title -->
+                            <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-0.5">
+                                ${member.title}
+                            </p>
+                        </div>
+                    </div>
+                `;
+
+                grid.appendChild(card);
+            });
+        }
+
+        // Category Filter Switch
+        function filterCategory(cat) {
+            currentFilter = cat;
+            document.querySelectorAll('.category-btn').forEach(btn => {
+                btn.className = 'category-btn px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-white text-slate-600 hover:bg-slate-100 border border-slate-200';
+            });
+
+            const activeBtn = document.getElementById(`btn-${cat}`);
+            if (activeBtn) {
+                activeBtn.className = 'category-btn active px-4 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all whitespace-nowrap bg-slate-900 text-white shadow-sm';
+            }
+
+            renderTeam();
+        }
+
+        // Search Filter
+        function handleSearch() {
+            renderTeam();
+        }
+
+        // Admin Auth Flow
+        function openLoginModal() {
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('hidden');
+            setTimeout(() => document.getElementById('passwordInput').focus(), 100);
+        }
+
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const val = document.getElementById('passwordInput').value;
+
+            if (val === PASSCODE) {
+                isAdminLoggedIn = true;
+                closeLoginModal();
+                updateAdminUI();
+                showToast('登入成功！已解鎖管理員權限');
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            isAdminLoggedIn = false;
+            updateAdminUI();
+            showToast('已安全退出管理員模式');
+        }
+
+        function updateAdminUI() {
+            const loginBtn = document.getElementById('loginBtn');
+            const logoutBtn = document.getElementById('logoutBtn');
+            const addBtn = document.getElementById('addPersonnelBtn');
+            const adminBadge = document.getElementById('adminBadge');
+
+            if (isAdminLoggedIn) {
+                loginBtn.classList.add('hidden');
+                logoutBtn.classList.remove('hidden');
+                logoutBtn.classList.add('flex');
+                addBtn.classList.remove('hidden');
+                addBtn.classList.add('flex');
+                adminBadge.classList.remove('hidden');
+                adminBadge.classList.add('flex');
+            } else {
+                loginBtn.classList.remove('hidden');
+                logoutBtn.classList.add('hidden');
+                addBtn.classList.add('hidden');
+                adminBadge.classList.add('hidden');
+            }
+
+            renderTeam();
+        }
+
+        // Add Personnel Flow
+        function openAddModal() {
+            document.getElementById('addName').value = '';
+            document.getElementById('addTitle').value = '';
+            document.getElementById('addCategory').value = 'hotel';
+            document.getElementById('addAvatarUrl').value = '';
+            document.getElementById('addAvatarFile').value = '';
+            document.getElementById('addFileUploadLabel').textContent = '從本機選取照片檔案';
+            addUploadedBase64 = '';
+            document.getElementById('addModal').classList.remove('hidden');
+        }
+
+        function closeAddModal() {
+            document.getElementById('addModal').classList.add('hidden');
+        }
+
+        function handleAddFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                addUploadedBase64 = evt.target.result;
+                document.getElementById('addFileUploadLabel').textContent = `已選擇: ${file.name}`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function handleAddPersonnel(e) {
+            e.preventDefault();
+            const name = document.getElementById('addName').value.trim();
+            const title = document.getElementById('addTitle').value.trim();
+            const category = document.getElementById('addCategory').value;
+            const url = document.getElementById('addAvatarUrl').value.trim();
+
+            let avatar = addUploadedBase64 || url || `https://placehold.co/300x400/0f172a/fbbf24?text=${encodeURIComponent(name)}`;
+
+            const newMember = {
+                id: 'm_' + Date.now(),
+                name,
+                title,
+                category,
+                avatar
+            };
+
+            teamData.unshift(newMember);
+            saveTeamData();
+            renderTeam();
+            closeAddModal();
+            showToast(`已新增主管：${name}`);
+        }
+
+        // Edit Personnel Flow
+        function openEditModal(id) {
+            const member = teamData.find(m => m.id === id);
+            if (!member) return;
+
+            document.getElementById('editId').value = member.id;
+            document.getElementById('editName').value = member.name;
+            document.getElementById('editTitle').value = member.title;
+            document.getElementById('editCategory').value = member.category;
+            document.getElementById('editAvatarUrl').value = member.avatar.startsWith('http') ? member.avatar : '';
+            document.getElementById('editAvatarFile').value = '';
+            document.getElementById('editFileUploadLabel').textContent = '選擇本機相片檔案';
+            editUploadedBase64 = '';
+
+            const preview = document.getElementById('editPreviewAvatar');
+            preview.src = member.avatar;
+
+            document.getElementById('editModal').classList.remove('hidden');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.add('hidden');
+        }
+
+        function handleEditFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(evt) {
+                editUploadedBase64 = evt.target.result;
+                document.getElementById('editPreviewAvatar').src = editUploadedBase64;
+                document.getElementById('editFileUploadLabel').textContent = `已選擇: ${file.name}`;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function updateEditPreviewFromUrl(url) {
+            if (url.trim() && !editUploadedBase64) {
+                document.getElementById('editPreviewAvatar').src = url;
+            }
+        }
+
+        function handleEditPersonnel(e) {
+            e.preventDefault();
+            const id = document.getElementById('editId').value;
+            const index = teamData.findIndex(m => m.id === id);
+            if (index === -1) return;
+
+            const name = document.getElementById('editName').value.trim();
+            const title = document.getElementById('editTitle').value.trim();
+            const category = document.getElementById('editCategory').value;
+            const url = document.getElementById('editAvatarUrl').value.trim();
+
+            let finalAvatar = teamData[index].avatar;
+            if (editUploadedBase64) {
+                finalAvatar = editUploadedBase64;
+            } else if (url) {
+                finalAvatar = url;
+            }
+
+            teamData[index] = {
+                ...teamData[index],
+                name,
+                title,
+                category,
+                avatar: finalAvatar
+            };
+
+            saveTeamData();
+            renderTeam();
+            closeEditModal();
+            showToast(`已更新「${name}」的資料`);
+        }
+
+        // Delete Personnel Flow
+        function openDeleteModal(id, name) {
+            pendingDeleteId = id;
+            document.getElementById('deleteTargetName').textContent = `確認要刪除「${name}」的主管卡片嗎？`;
+            document.getElementById('deleteModal').classList.remove('hidden');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteModal').classList.add('hidden');
+            pendingDeleteId = null;
+        }
+
+        function confirmDelete() {
+            if (!pendingDeleteId) return;
+            teamData = teamData.filter(m => m.id !== pendingDeleteId);
+            saveTeamData();
+            renderTeam();
+            closeDeleteModal();
+            showToast('已成功刪除該位主管卡片');
+        }
+
+        // Toast Notification System
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMsg');
+            toastMsg.textContent = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
